@@ -14,9 +14,11 @@ takeWhile p (x:xs)
             | otherwise =  []
 
 {-# RULES
-"takeWhile/fuse"    [~1] forall p xs. takeWhile p xs = build $ \c n -> foldr (takeWhileFB p c n) n xs
-"takeWhile/back"   [1] forall p xs. foldr (takeWhileFB p (:) []) [] xs = takeWhile p xs
-  #-}
+"takeWhile/fuse" [~1]
+  forall p xs . takeWhile p xs = build $ \c n -> foldr (takeWhileFB p c n) n xs
+"takeWhile/back" [1]
+  forall p xs . foldr (takeWhileFB p (:) []) [] xs = takeWhile p xs
+ #-}
 
 
 toChar digit = toEnum $ digit + fromEnum '0'
