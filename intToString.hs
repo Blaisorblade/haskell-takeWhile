@@ -21,16 +21,18 @@ takeWhileFB p c n x xs = if p x then x `c` xs else n
 {-
 "takeWhile/fuse" [~1]
   forall p xs . takeWhile p xs = build $ \c n -> foldr (takeWhileFB p c n) n xs
-"takeWhile/back" [1]
-  forall p xs . foldr (takeWhileFB p (:) []) [] xs = takeWhile p xs
  -}
 
 {- This rule works only without takeWhile/back, because apparently inlining is
-done in the phase after this rule is applied.-}
+done in the phase after this rule is applied - phase 1. And in that phase, even
+build is inlined, preventing fusion from working. But then, why does it work
+when the back rule is not there? -}
 
 {-# RULES
 "takeWhile/fuseBad" [~1]
   forall p xs . takeWhile p xs = takeWhile' p xs
+"takeWhile/back" [0]
+  forall p xs . foldr (takeWhileFB p (:) []) [] xs = takeWhile p xs
  #-}
 
 
