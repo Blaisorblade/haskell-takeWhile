@@ -3,15 +3,16 @@ module IntToString where
 import Prelude hiding (takeWhile)
 import GHC.Exts
 
-takeWhileFB p c n x xs = if p x then x `c` xs else n
-{-# INLINE [0] takeWhileFB #-}
-
-{-# NOINLINE [1] takeWhile #-} -- We want the RULE to fire first.
 takeWhile               :: (a -> Bool) -> [a] -> [a]
+{-# NOINLINE [1] takeWhile #-} -- We want the RULE to fire first.
 takeWhile _ []          =  []
 takeWhile p (x:xs)
             | p x       =  x : takeWhile p xs
             | otherwise =  []
+
+
+takeWhileFB p c n x xs = if p x then x `c` xs else n
+{-# INLINE [0] takeWhileFB #-}
 
 {-# RULES
 "takeWhile/fuse" [~1]
