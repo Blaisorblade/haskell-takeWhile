@@ -3,6 +3,10 @@ module IntToString where
 import Prelude hiding (takeWhile)
 import GHC.Exts
 
+takeWhile' :: (a -> Bool) -> [a] -> [a]
+takeWhile' p xs = build $ \c n -> foldr (takeWhileFB p c n) n xs
+{-# INLINE takeWhile' #-}
+
 takeWhile               :: (a -> Bool) -> [a] -> [a]
 {-# NOINLINE [1] takeWhile #-} -- We want the RULE to fire first.
 takeWhile _ []          =  []
@@ -14,11 +18,19 @@ takeWhile p (x:xs)
 takeWhileFB p c n x xs = if p x then x `c` xs else n
 {-# INLINE [0] takeWhileFB #-}
 
-{-# RULES
+{-
 "takeWhile/fuse" [~1]
   forall p xs . takeWhile p xs = build $ \c n -> foldr (takeWhileFB p c n) n xs
 "takeWhile/back" [1]
   forall p xs . foldr (takeWhileFB p (:) []) [] xs = takeWhile p xs
+ -}
+
+{- This rule works only without takeWhile/back, because apparently inlining is
+done in the phase after this rule is applied.-}
+
+{-# RULES
+"takeWhile/fuseBad" [~1]
+  forall p xs . takeWhile p xs = takeWhile' p xs
  #-}
 
 
